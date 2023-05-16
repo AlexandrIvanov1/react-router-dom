@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React from 'react';
 import './App.css';
-import {Route, Routes} from 'react-router-dom';
+import {Navigate, Route, Routes} from 'react-router-dom';
 import {HomePage} from './pages/HomePage';
 import {AboutPage} from './pages/AboutPage';
 import {BlogPage} from './pages/BlogPage';
@@ -9,94 +9,49 @@ import {Layout} from './components/Layout';
 import {SinglePage} from './pages/SinglePage';
 import {CreatePost} from './pages/CreatePost';
 import {EditPost} from './pages/EditPost';
-
-export type PostType = {
-    id: number
-    userId: number
-    body: string
-    title: string
-}
+import {changePostTitleAC, PostType} from './store/posts-reducer';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppRootStateType} from './store/store';
+import {Login} from './pages/Login';
+import {RequireAuth} from './hoc/RequireAuth';
+import {AuthProvider} from './hoc/AuthProvider';
 
 function App() {
 
-    const [posts, setPosts] = useState<Array<PostType>>([
-        {
-            userId: 1,
-            id: 1,
-            title: 'sunt aut facere repellat provident occaecati excepturi optio reprehenderit',
-            body: 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto'
-        },
-        {
-            userId: 1,
-            id: 2,
-            title: 'qui est esse',
-            body: 'est rerum tempore vitae\nsequi sint nihil reprehenderit dolor beatae ea dolores neque\nfugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis\nqui aperiam non debitis possimus qui neque nisi nulla'
-        },
-        {
-            userId: 1,
-            id: 3,
-            title: 'ea molestias quasi exercitationem repellat qui ipsa sit aut',
-            body: 'et iusto sed quo iure\nvoluptatem occaecati omnis eligendi aut ad\nvoluptatem doloribus vel accusantium quis pariatur\nmolestiae porro eius odio et labore et velit aut'
-        },
-        {
-            userId: 1,
-            id: 4,
-            title: 'eum et est occaecati',
-            body: 'ullam et saepe reiciendis voluptatem adipisci\nsit amet autem assumenda provident rerum culpa\nquis hic commodi nesciunt rem tenetur doloremque ipsam iure\nquis sunt voluptatem rerum illo velit'
-        },
-        {
-            userId: 1,
-            id: 5,
-            title: 'nesciunt quas odio',
-            body: 'repudiandae veniam quaerat sunt sed\nalias aut fugiat sit autem sed est\nvoluptatem omnis possimus esse voluptatibus quis\nest aut tenetur dolor neque'
-        },
-        {
-            userId: 1,
-            id: 6,
-            title: 'dolorem eum magni eos aperiam quia',
-            body: 'ut aspernatur corporis harum nihil quis provident sequi\nmollitia nobis aliquid molestiae\nperspiciatis et ea nemo ab reprehenderit accusantium quas\nvoluptate dolores velit et doloremque molestiae'
-        },
-        {
-            userId: 1,
-            id: 7,
-            title: 'magnam facilis autem',
-            body: 'dolore placeat quibusdam ea quo vitae\nmagni quis enim qui quis quo nemo aut saepe\nquidem repellat excepturi ut quia\nsunt ut sequi eos ea sed quas'
-        },
-        {
-            userId: 1,
-            id: 8,
-            title: 'dolorem dolore est ipsam',
-            body: 'dignissimos aperiam dolorem qui eum\nfacilis quibusdam animi sint suscipit qui sint possimus cum\nquaerat magni maiores excepturi\nipsam ut commodi dolor voluptatum modi aut vitae'
-        },
-        {
-            userId: 1,
-            id: 9,
-            title: 'nesciunt iure omnis dolorem tempora et accusantium',
-            body: 'consectetur animi nesciunt iure dolore\nenim quia ad\nveniam autem ut quam aut nobis\net est aut quod aut provident voluptas autem voluptas'
-        },
-        {
-            userId: 1,
-            id: 10,
-            title: 'optio molestias id quia eum',
-            body: 'quo et expedita modi cum officia vel magni\ndoloribus qui repudiandae\nvero nisi sit\nquos veniam quod sed accusamus veritatis error'
-        }
-    ])
+    const posts = useSelector<AppRootStateType, Array<PostType>>(state => state.posts)
+
+    const dispatch = useDispatch()
+
+    const changePostTitle = (postId: number, title: string) => {
+        dispatch(changePostTitleAC(postId, title))
+    }
 
     return (
-        <div className="App">
-            <Routes>
-                <Route path="/" element={<Layout/>}>
-                    <Route index element={<HomePage/>}/>
-                    <Route path="posts" element={<BlogPage/>}/>
-                    <Route path="posts/:id" element={<SinglePage/>}/>
-                    <Route path="posts/:id/edit" element={<EditPost/>}/>
-                    <Route path="posts/new" element={<CreatePost/>}/>
-                    <Route path="about" element={<AboutPage/>}/>
-                    <Route path="*" element={<NotFoundPage/>}/>
-                </Route>
-            </Routes>
-        </div>
-    );
+        <AuthProvider>
+            <div className="App">
+                <Routes>
+                    <Route path="/" element={<Layout/>}>
+                        <Route index element={<HomePage/>}/>
+                        <Route path="posts" element={<BlogPage posts={posts}/>}/>
+                        <Route path="posts/:id" element={<SinglePage posts={posts}/>}/>
+                        <Route path="posts/:id/edit"
+                               element={<EditPost posts={posts} changePostTitle={changePostTitle}/>}/>
+                        <Route path="about" element={<AboutPage/>}/>
+
+                        <Route path="posts/new" element={
+                            <RequireAuth>
+                                <CreatePost/>
+                            </RequireAuth>}
+                        />
+
+                        <Route path="about-us" element={<Navigate to={'/about'} replace/>}/>
+                        <Route path="login" element={<Login/>}/>
+                        <Route path="*" element={<NotFoundPage/>}/>
+                    </Route>
+                </Routes>
+            </div>
+        </AuthProvider>
+    )
 }
 
 export default App;

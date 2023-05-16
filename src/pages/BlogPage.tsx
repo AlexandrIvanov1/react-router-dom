@@ -1,20 +1,19 @@
-import React, {useEffect, useState} from 'react';
-import {Link} from 'react-router-dom';
-import {PostType} from '../App';
+import React from 'react';
+import {Link, useLocation} from 'react-router-dom';
+import {PostType} from '../store/posts-reducer';
 
-export const BlogPage = () => {
+type BlogPagePropsType = {
+    posts: Array<PostType>
+}
 
-    const [posts, setPosts] = useState<Array<PostType>>([])
+export const BlogPage: React.FC<BlogPagePropsType> = ({posts}) => {
 
-    useEffect(() => {
-        fetch('https://jsonplaceholder.typicode.com/posts')
-            .then(response => response.json())
-            .then(json => setPosts(json))
-    }, [])
+    console.log(useLocation())
 
     return (
         <div>
             <h1>Blog Page</h1>
+            <Link to='/posts/new'>Add new post</Link>
             {posts.map(p => {
                 return (
                         <Link key={p.id} to={`/posts/${p.id}`} className={'link'}>
