@@ -36,7 +36,10 @@ function App() {
                         <Route path="posts/:id" element={<SinglePage posts={posts}/>}/>
                         <Route path="posts/:id/edit"
                                element={<EditPost posts={posts} changePostTitle={changePostTitle}/>}/>
-                        <Route path="about" element={<AboutPage/>}/>
+                        <Route path="about" element={<AboutPage/>}>
+                            <Route path="contacts" element={<p>Our contacts</p>}></Route>
+                            <Route path="team" element={<p>Our team</p>}></Route>
+                        </Route>
 
                         <Route path="posts/new" element={
                             <RequireAuth>

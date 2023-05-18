@@ -8,7 +8,7 @@ type CustomLinkPropsType = {
 
 export const CustomLink: React.FC<CustomLinkPropsType> = ({children, path, ...props}) => {
 
-    const match = useMatch(path)
+    const match = useMatch({path: path, end: path.length === 1})
 
     return (
         <Link
